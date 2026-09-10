@@ -10,7 +10,9 @@ BlockLedger/
 ├── SUBMISSION_GUIDE.md
 ├── submission/
 │   ├── PRESENTATION.md
-│   └── DEMO.md
+│   ├── DEMO.md
+│   ├── Mercury_SIH2026_Presentation.pptx
+│   └── Mercury_SIH2026_Presentation.pdf
 ├── app/
 ├── lib/
 ├── components/

@@ -1,6 +1,29 @@
 # BlockLedger — Blockchain-Based Secure Platform for Identity, Access Control and Digital Asset Management
 
+<div align="center">
+
+[![SIH 2025 WINNERS](https://img.shields.io/badge/%F0%9F%8F%86%20SIH%202025-WINNERS-FFD700?style=for-the-badge&labelColor=1a1a1a)](https://www.linkedin.com/posts/harsh-kumar-1a6400347_sih2025-golang-docker-activity-7405177021569503232-_HZj?utm_source=share&utm_medium=member_desktop&rcm=ACoAAFa8IQ4BapEnu8Htl17BgKSEKPsV_gpwKiI)
+[![Team Mercury](https://img.shields.io/badge/Team-MERCURY-4AE3B5?style=for-the-badge&labelColor=1a1a1a)](#14-team)
+
+![SIH 2026](https://img.shields.io/badge/SIH-2026-1f6feb?style=flat-square)
+![PS 26125](https://img.shields.io/badge/PS%20ID-26125-1f6feb?style=flat-square)
+![BEL](https://img.shields.io/badge/Org-Bharat%20Electronics%20Limited-555?style=flat-square)
+![Software](https://img.shields.io/badge/Category-Software-555?style=flat-square)
+![Blockchain & Cybersecurity](https://img.shields.io/badge/Theme-Blockchain%20%26%20Cybersecurity-555?style=flat-square)
+
+</div>
+
+> [!IMPORTANT]
+> ## 🏆 We won Smart India Hackathon 2025 last year — **Team Mercury**
+>
+> **[→ View the LinkedIn post](https://www.linkedin.com/posts/harsh-kumar-1a6400347_sih2025-golang-docker-activity-7405177021569503232-_HZj?utm_source=share&utm_medium=member_desktop&rcm=ACoAAFa8IQ4BapEnu8Htl17BgKSEKPsV_gpwKiI)**
+>
+> Returning for SIH 2026 with **BlockLedger**.
+
+---
+
 ## 1. Project Information
+
 
 - **Project Title:** BlockLedger — Blockchain-Based Secure Platform for Identity, Access Control and Digital Asset Management
 - **PS ID:** 26125
@@ -51,7 +74,7 @@ Every record carries an `anchorMode` field of either `onchain` or `simulated` an
 
 ## 5. Technology Stack
 
-- **Frontend:** Next.js 15 (App Router), React 19, TypeScript
+- **Frontend:** Next.js 16 (App Router), React 19, TypeScript
 - **Styling / UI:** Tailwind CSS v4, shadcn/ui, Framer Motion
 - **Blockchain:** Solana (devnet), `@solana/web3.js`, Solana Wallet Adapter
 - **Decentralised storage:** IPFS via Pinata
@@ -91,7 +114,9 @@ BlockLedger/
 ├── SUBMISSION_GUIDE.md
 ├── submission/
 │   ├── PRESENTATION.md
-│   └── DEMO.md
+│   ├── DEMO.md
+│   ├── Mercury_SIH2026_Presentation.pptx
+│   └── Mercury_SIH2026_Presentation.pdf
 ├── app/                      # Next.js App Router pages
 │   ├── page.tsx              # Landing page
 │   ├── dashboard/
@@ -110,9 +135,11 @@ BlockLedger/
 ├── hooks/                    # useSolanaAction (real devnet), useIpfs (real Pinata)
 ├── components/
 ├── docs/
-│   └── architecture.md
+│   ├── architecture.md
+│   └── make_presentation.py
 ├── assets/
 │   └── screenshots/
+│       └── 01-landing.png
 ├── package.json
 ├── .gitignore
 └── LICENSE
@@ -203,6 +230,11 @@ All demo accounts use the password `password123`.
 
 ## 14. Team
 
+> [!IMPORTANT]
+> ### 🏆 **We won Smart India Hackathon 2025 last year — Team Mercury**
+>
+> **[→ View the LinkedIn post](https://www.linkedin.com/posts/harsh-kumar-1a6400347_sih2025-golang-docker-activity-7405177021569503232-_HZj?utm_source=share&utm_medium=member_desktop&rcm=ACoAAFa8IQ4BapEnu8Htl17BgKSEKPsV_gpwKiI)**
+
 **Team name:** Mercury
 **Institute:** Netaji Subhas University of Technology (NSUT)
 
@@ -215,8 +247,6 @@ All demo accounts use the password `password123`.
 | **Zoya** | Cryptography, hash-chained audit ledger |
 | **Shauryan** | IPFS / decentralised storage, deployment and QA |
 
-**We won SIH 2025 last year — Team Mercury.**
-[View the LinkedIn post](https://www.linkedin.com/posts/harsh-kumar-1a6400347_sih2025-golang-docker-activity-7405177021569503232-_HZj?utm_source=share&utm_medium=member_desktop&rcm=ACoAAFa8IQ4BapEnu8Htl17BgKSEKPsV_gpwKiI)
 
 ## Important
 
