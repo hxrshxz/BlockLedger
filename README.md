@@ -215,7 +215,8 @@ All demo accounts use the password `password123`.
 | **Zoya** | Cryptography, hash-chained audit ledger |
 | **Shauryan** | IPFS / decentralised storage, deployment and QA |
 
-Harsh and Anushka are Smart India Hackathon 2025 winners.
+**We won SIH 2025 last year — Team Mercury.**
+[View the LinkedIn post](https://www.linkedin.com/posts/harsh-kumar-1a6400347_sih2025-golang-docker-activity-7405177021569503232-_HZj?utm_source=share&utm_medium=member_desktop&rcm=ACoAAFa8IQ4BapEnu8Htl17BgKSEKPsV_gpwKiI)
 
 ## Important
 

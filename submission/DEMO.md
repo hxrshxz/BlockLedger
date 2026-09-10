@@ -1,14 +1,8 @@
 # Demo Video
 
-## Demo video link
+No demo video has been recorded yet.
 
-`<PASTE_YOUTUBE_OR_GOOGLE_DRIVE_VIDEO_LINK_HERE>`
-
-## Live deployment
-
-`<PASTE_VERCEL_DEPLOYMENT_URL_HERE>`
-
-## What the video should show
+## What the video will show
 
 1. The problem — centralised identity, unverifiable access logs, weak asset provenance in a large organisation such as BEL.
 2. The proposed solution — DIDs, contract-enforced RBAC, NFT-bound assets, hash-chained audit trail.
@@ -19,5 +13,3 @@
    - `/audit` — run **Verify chain**, then tamper with an entry and show the verifier reporting the exact broken index.
 4. Real on-chain proof — connect a Solana devnet wallet on `/wallet`, anchor an audit entry, and open the resulting signature in a block explorer.
 5. Closing note on what is real versus simulated (see `docs/architecture.md`).
-
-Keep the video focused on the working prototype and make sure reviewers can access it without requesting permission.

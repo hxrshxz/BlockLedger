@@ -1,21 +1,6 @@
 # SIH 2026 Submission Guide
 
-Checklist status for the **BlockLedger** repository (PS ID 26125).
-
-## Required repository content
-
-- [x] Actual source code is present.
-- [x] `README.md` explains the project clearly.
-- [x] PS ID and PS title are included.
-- [x] Problem statement and proposed solution are explained.
-- [x] Key features are listed.
-- [x] Technology stack is listed.
-- [x] Setup and run instructions work.
-- [x] Team members and roles are mentioned (README section 14).
-- [x] Important screenshots are included in `assets/screenshots/`.
-- [ ] Final PPT/presentation placed in `submission/` — **pending**.
-- [ ] Demo video link added to `submission/DEMO.md` — **optional, pending**.
-- [ ] Repository is accessible to reviewers — verify after push.
+Reference notes for the **BlockLedger** repository (PS ID 26125).
 
 ## Repository structure
 
@@ -41,15 +26,11 @@ BlockLedger/
 
 ## Presentation
 
-Upload the final PPT/PPTX to the `submission/` folder using a clear filename such as:
-
-`Mercury_SIH2026_Presentation.pptx`
-
-If the file is too large for GitHub, upload it to Google Drive or OneDrive and put the shareable viewer link in `submission/PRESENTATION.md`.
+The final presentation is in [`submission/PRESENTATION.md`](submission/PRESENTATION.md), with the PPTX, PDF and a Google Drive link.
 
 ## Demo video
 
-Optional. If available, add the YouTube/Google Drive link to `submission/DEMO.md` and make sure it is accessible without requesting permission.
+See [`submission/DEMO.md`](submission/DEMO.md).
 
 ## Screenshots
 
@@ -79,4 +60,4 @@ Screenshots live in `assets/screenshots/`. See the naming convention in `assets/
 
 ## Before submission
 
-Open the repository in a private/incognito window while logged out and confirm the reviewer can access the code, PPT, screenshots, documentation and any linked material.
+Open the repository in a private/incognito window while logged out and confirm the reviewer can access the code, PPT, screenshots and documentation.
