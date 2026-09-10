@@ -3,13 +3,13 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import HeroSection from "@/components/HeroSection";
 import Features from "@/components/features";
-import { TestimonialsSection } from "@/components/testimonials";
+import { BuiltForSection } from "@/components/built-for";
 import { NewReleasePromo } from "@/components/new-release-promo";
 import { FAQSection } from "@/components/faq-section";
-import { PricingSection } from "@/components/pricing-clean";
+import { HowItWorks } from "@/components/how-it-works";
 import { StickyFooter } from "@/components/sticky-footer";
 import { NavBar as TubeNav } from "@/components/ui/tubelight-navbar";
-import { Star, BadgeInfo, MessageSquare } from "lucide-react";
+import { Layers, Workflow, ShieldCheck, HelpCircle } from "lucide-react";
 
 export default function Home() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -65,28 +65,23 @@ export default function Home() {
           perspective: "1000px",
         }}
       >
-        <a
-          className={`z-50 flex items-center justify-center gap-2 transition-all duration-300 ${
+        <Link
+          href="/"
+          className={`z-50 flex items-center justify-center gap-2 text-sm font-semibold tracking-tight transition-all duration-300 ${
             isScrolled ? "ml-4" : ""
           }`}
-          target="_blank"
-          rel="noopener noreferrer"
         >
-         
-        </a>
+          BlockLedger
+        </Link>
 
         <div className="absolute inset-0 hidden flex-1 flex-row items-center justify-center md:flex">
           <TubeNav
             fixed={false}
             items={[
-              { name: "Features", url: "#features", icon: Star },
-              { name: "Pricing", url: "#pricing", icon: BadgeInfo },
-              {
-                name: "Testimonials",
-                url: "#testimonials",
-                icon: MessageSquare,
-              },
-              { name: "FAQ", url: "#faq", icon: BadgeInfo },
+              { name: "Platform", url: "#features", icon: Layers },
+              { name: "How it works", url: "#how-it-works", icon: Workflow },
+              { name: "Built for", url: "#built-for", icon: ShieldCheck },
+              { name: "FAQ", url: "#faq", icon: HelpCircle },
             ]}
           />
         </div>
@@ -101,23 +96,22 @@ export default function Home() {
           </Link> */}
 
           <Link
-            href="/signup"
+            href="/dashboard"
             className="rounded-md font-bold relative cursor-pointer hover:-translate-y-0.5 transition duration-200 inline-block text-center bg-gradient-to-b from-primary to-primary/80 text-primary-foreground shadow-[0px_2px_0px_0px_rgba(255,255,255,0.3)_inset] px-4 py-2 text-sm"
           >
-            Sign Up
+            Launch Platform
           </Link>
         </div>
       </header>
 
       {/* Mobile Header */}
       <header className="sticky top-4 z-[9999] mx-4 flex w-auto flex-row items-center justify-between rounded-full bg-background/80 backdrop-blur-sm border border-border/50 shadow-lg md:hidden px-4 py-3 overflow-x-clip">
-        <a
-          className="flex items-center justify-center gap-2"
-          target="_blank"
-          rel="noopener noreferrer"
+        <Link
+          href="/"
+          className="flex items-center justify-center gap-2 text-sm font-semibold tracking-tight"
         >
-         
-        </a>
+          BlockLedger
+        </Link>
 
         <button
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -153,19 +147,19 @@ export default function Home() {
                 onClick={() => handleMobileNavClick("features")}
                 className="text-left px-4 py-3 text-lg font-medium text-muted-foreground hover:text-foreground transition-colors rounded-lg hover:bg-background/50"
               >
-                Features
+                Platform
               </button>
               <button
-                onClick={() => handleMobileNavClick("pricing")}
+                onClick={() => handleMobileNavClick("how-it-works")}
                 className="text-left px-4 py-3 text-lg font-medium text-muted-foreground hover:text-foreground transition-colors rounded-lg hover:bg-background/50"
               >
-                Pricing
+                How it works
               </button>
               <button
-                onClick={() => handleMobileNavClick("testimonials")}
+                onClick={() => handleMobileNavClick("built-for")}
                 className="text-left px-4 py-3 text-lg font-medium text-muted-foreground hover:text-foreground transition-colors rounded-lg hover:bg-background/50"
               >
-                Testimonials
+                Built for
               </button>
               <button
                 onClick={() => handleMobileNavClick("faq")}
@@ -175,21 +169,16 @@ export default function Home() {
               </button>
               <div className="border-t border-border/50 pt-4 mt-4 flex flex-col space-y-3">
                 <Link
-                  href="/login"
+                  href="/audit"
                   className="px-4 py-3 text-lg font-medium text-muted-foreground hover:text-foreground transition-colors rounded-lg hover:bg-background/50 cursor-pointer"
-                  onClick={() =>
-                    console.log(
-                      "Mobile login button clicked - navigating to /login"
-                    )
-                  }
                 >
-                  Log In
+                  Audit Trail
                 </Link>
                 <Link
-                  href="/signup"
+                  href="/dashboard"
                   className="px-4 py-3 text-lg font-bold text-center bg-gradient-to-b from-primary to-primary/80 text-primary-foreground rounded-lg shadow-lg hover:-translate-y-0.5 transition-all duration-200"
                 >
-                  Sign Up
+                  Launch Platform
                 </Link>
               </div>
             </nav>
@@ -207,14 +196,14 @@ export default function Home() {
         <Features />
       </div>
 
-      {/* Pricing Section */}
-      <div id="pricing" className="section-glow">
-        <PricingSection />
+      {/* How It Works Section */}
+      <div id="how-it-works" className="section-glow">
+        <HowItWorks />
       </div>
 
-      {/* Testimonials Section */}
-      <div id="testimonials" className="section-glow">
-        <TestimonialsSection />
+      {/* Built For Section */}
+      <div id="built-for" className="section-glow">
+        <BuiltForSection />
       </div>
 
       <NewReleasePromo />

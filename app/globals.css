@@ -630,7 +630,7 @@ body {
   }
 }
 
-/* ——— CyFuture Blue Glow: extremely dark, cool tint, warm 10% accent (60/30/10) ——— */
+/* ——— BlockLedger Blue Glow: extremely dark, cool tint, warm 10% accent (60/30/10) ——— */
 /* Brand & depth tokens */
 :root {
   --brand-blue: oklch(0.7 0.14 255);
@@ -1004,4 +1004,34 @@ svg {
 
 svg * {
   vector-effect: none !important;
+}
+
+/* ---------------------------------------------------------------------------
+ * Tailwind v4 compatibility shim for the shadcn sidebar.
+ *
+ * `components/ui/sidebar.tsx` is a Tailwind v3-era file and sizes its layout
+ * with the v3 shorthand `w-[--sidebar-width]`. Tailwind v4 no longer expands a
+ * bare custom property inside arbitrary-value brackets into `var(...)`, so that
+ * utility emits an invalid declaration and the desktop spacer collapses to 0px
+ * — which drops every app page's content underneath the fixed sidebar.
+ *
+ * The sidebar component itself is out of scope to edit, so the widths are
+ * restored here, scoped tightly to the sidebar wrapper. Remove this block if
+ * `components/ui/sidebar.tsx` is ever regenerated for v4 (which uses the
+ * `w-(--sidebar-width)` syntax).
+ * ------------------------------------------------------------------------- */
+
+/* Desktop spacer that reserves the sidebar's column in normal flow. */
+.group\/sidebar-wrapper > .group.peer[data-collapsible=""] > div:first-child {
+  width: var(--sidebar-width);
+}
+
+/* The fixed sidebar panel itself. */
+.group\/sidebar-wrapper > .group.peer > div:nth-child(2) {
+  width: var(--sidebar-width);
+}
+
+/* Mobile drawer: SidebarProvider re-declares --sidebar-width on the sheet. */
+[data-mobile="true"][data-sidebar="sidebar"] {
+  width: var(--sidebar-width);
 }

@@ -1,7 +1,5 @@
 "use client";
 
-import type React from "react";
-
 import { useTheme } from "next-themes";
 import Earth from "./ui/globe";
 import ScrambleHover from "./ui/scramble";
@@ -11,356 +9,202 @@ import { Suspense, useEffect, useRef, useState } from "react";
 import { geist } from "@/lib/fonts";
 import { cn } from "@/lib/utils";
 
+type Pillar = {
+  title: string;
+  body: string;
+  detail: string[];
+};
+
+const pillars: Pillar[] = [
+  {
+    title: "Decentralized Identity",
+    body: "Every participant holds a self-sovereign DID of the form did:blkl:sol:<pubkey>, derived from their own keypair. No central directory issues it and no administrator can silently revoke it — authentication is a cryptographic proof, not a database lookup.",
+    detail: [
+      "W3C-shaped DID Documents",
+      "Ed25519 verification methods",
+      "DID Document pinned to IPFS",
+    ],
+  },
+  {
+    title: "NFT-Based Asset Ownership",
+    body: "Documents, design files, firmware images, certificates, licences and hardware passports are minted as NFTs. Each token is unique, traceable and bound directly to a holder's DID, creating a permanent and unforgeable link between the asset and its owner.",
+    detail: [
+      "SHA-256 content hash as the asset fingerprint",
+      "Owner field references a DID, not an address alias",
+      "Transfer history retained per token",
+    ],
+  },
+  {
+    title: "Smart-Contract Governance",
+    body: "Minting, allocation, transfer and validation rules live in contract logic rather than in application code. Only authorized administrators can mint and assign assets, so unauthorized duplication or reassignment fails at the protocol layer instead of being caught after the fact.",
+    detail: [
+      "Deterministic authorization checks",
+      "Unauthorized calls revert with a reason",
+      "Same rules for UI, API and direct calls",
+    ],
+  },
+  {
+    title: "Role-Based Access Control",
+    body: "Four roles — Admin, Manager, Auditor and User — are attached to identities, not to sessions. Administrators define which permissions each role carries, and the contracts evaluate that matrix on every single operation.",
+    detail: [
+      "Live role × permission matrix",
+      "Permission changes are themselves audited",
+      "Least-privilege by default for User and Auditor",
+    ],
+  },
+  {
+    title: "Immutable Audit Trail",
+    body: "Identity creation, NFT minting, asset allocation, permission changes and ownership transfers are appended to a hash-chained ledger where every entry commits to the hash of the one before it. Altering any historical record breaks the chain and is detected immediately.",
+    detail: [
+      "Hash-chained, append-only entries",
+      "Anchored on Solana devnet",
+      "Built-in tamper detection over the full chain",
+    ],
+  },
+  {
+    title: "Content-Addressed Storage",
+    body: "Payloads are addressed by their own hash rather than by location. The content identifier is what gets recorded on-chain, so a retrieved file either hashes back to the recorded value or it is not the file that was registered.",
+    detail: [
+      "IPFS pinning via Pinata when configured",
+      "Clearly-labelled local simulation otherwise",
+      "Hash verification on every retrieval",
+    ],
+  },
+];
+
+function PillarCard({
+  pillar,
+  index,
+  isInView,
+}: {
+  pillar: Pillar;
+  index: number;
+  isInView: boolean;
+}) {
+  return (
+    <motion.div
+      className="group border-secondary/40 text-card-foreground relative col-span-12 flex flex-col gap-5 overflow-hidden rounded-xl border-2 p-6 shadow-xl md:col-span-6"
+      initial={{ opacity: 0, y: 40 }}
+      animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 40 }}
+      transition={{ duration: 0.5, delay: 0.15 + index * 0.08 }}
+      whileHover={{
+        scale: 1.01,
+        borderColor: "rgba(231, 138, 83, 0.6)",
+        boxShadow: "0 0 30px rgba(231, 138, 83, 0.2)",
+      }}
+    >
+      <div className="text-primary/70 font-mono text-xs tracking-widest">
+        {String(index + 1).padStart(2, "0")}
+      </div>
+      <h3 className="text-2xl leading-none font-semibold tracking-tight uppercase">
+        {pillar.title}
+      </h3>
+      <p className="text-muted-foreground max-w-[520px] text-sm leading-relaxed">
+        {pillar.body}
+      </p>
+      <ul className="mt-auto flex flex-col gap-2 pt-2">
+        {pillar.detail.map((d) => (
+          <li
+            key={d}
+            className="text-muted-foreground/80 flex items-start gap-2 font-mono text-xs"
+          >
+            <span className="text-primary mt-[2px]">—</span>
+            <span>{d}</span>
+          </li>
+        ))}
+      </ul>
+    </motion.div>
+  );
+}
+
 export default function Features() {
   const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, amount: 0.3 });
+  const isInView = useInView(ref, { once: true, amount: 0.1 });
   const { theme } = useTheme();
   const [isHovering, setIsHovering] = useState(false);
-  const [isCliHovering, setIsCliHovering] = useState(false);
-  const [isFeature3Hovering, setIsFeature3Hovering] = useState(false);
-  const [isFeature4Hovering, setIsFeature4Hovering] = useState(false);
-  const [inputValue, setInputValue] = useState("");
 
   const [baseColor, setBaseColor] = useState<[number, number, number]>([
     0.906, 0.541, 0.325,
-  ]); // #e78a53 in RGB normalized
+  ]);
   const [glowColor, setGlowColor] = useState<[number, number, number]>([
     0.906, 0.541, 0.325,
-  ]); // #e78a53 in RGB normalized
-
+  ]);
   const [dark, setDark] = useState<number>(theme === "dark" ? 1 : 0);
 
   useEffect(() => {
-    setBaseColor([0.906, 0.541, 0.325]); // #e78a53
-    setGlowColor([0.906, 0.541, 0.325]); // #e78a53
+    setBaseColor([0.906, 0.541, 0.325]);
+    setGlowColor([0.906, 0.541, 0.325]);
     setDark(theme === "dark" ? 1 : 0);
   }, [theme]);
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      setInputValue("");
-    }
-  };
-
   return (
-    <section
-      id="features"
-      className="text-foreground relative overflow-hidden py-12 sm:py-24 md:py-32"
-    >
+    <section className="text-foreground relative overflow-hidden py-12 sm:py-24 md:py-32">
       <div className="bg-primary absolute -top-10 left-1/2 h-16 w-44 -translate-x-1/2 rounded-full opacity-40 blur-3xl select-none"></div>
-      <div className="via-primary/50 absolute top-0 left-1/2 h-px w-3/5 -translate-x-1/2 bg-gradient-to-r from-transparent to-transparent transition-all ease-in-out"></div>
+      <div className="via-primary/50 absolute top-0 left-1/2 h-px w-3/5 -translate-x-1/2 bg-gradient-to-r from-transparent to-transparent"></div>
+
       <motion.div
         ref={ref}
         initial={{ opacity: 0, y: 50 }}
         animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 50 }}
-        transition={{ duration: 0.5, delay: 0 }}
-        className="container mx-auto flex flex-col items-center gap-6 sm:gap-12"
+        transition={{ duration: 0.5 }}
+        className="container mx-auto flex flex-col items-center gap-6 px-4 sm:gap-12"
       >
-        <h2
-          className={cn(
-            "via-foreground mb-8 bg-gradient-to-b from-zinc-800 to-zinc-700 bg-clip-text text-center text-4xl font-semibold tracking-tighter text-transparent md:text-[54px] md:leading-[60px]",
-            geist.className
-          )}
-        >
-          Features
-        </h2>
-        <FollowerPointerCard
-          title={
-            <div className="flex items-center gap-2">
-              <span>✨</span>
-              <span>Interactive Features</span>
-            </div>
-          }
-        >
+        <div className="flex flex-col items-center gap-4">
+          <h2
+            className={cn(
+              "via-foreground bg-gradient-to-b from-zinc-800 to-zinc-700 bg-clip-text text-center text-4xl font-semibold tracking-tighter text-transparent md:text-[54px] md:leading-[60px]",
+              geist.className
+            )}
+          >
+            The platform, in six parts
+          </h2>
+          <p className="text-muted-foreground max-w-2xl text-center text-sm md:text-base">
+            Centralized IAM concentrates every credential behind one perimeter,
+            and asset ownership is scattered across disconnected systems where
+            provenance cannot be checked. BlockLedger removes both single points
+            of failure.
+          </p>
+        </div>
+
+        <FollowerPointerCard title={<span>BlockLedger</span>}>
           <div className="cursor-none">
-            <div className="grid grid-cols-12 gap-4 justify-center">
-              {/* Cli */}
+            <div className="grid grid-cols-12 justify-center gap-4">
+              {pillars.map((pillar, index) => (
+                <PillarCard
+                  key={pillar.title}
+                  pillar={pillar}
+                  index={index}
+                  isInView={isInView}
+                />
+              ))}
+
+              {/* On-chain anchoring */}
               <motion.div
-                className="group border-secondary/40 text-card-foreground relative col-span-12 flex flex-col overflow-hidden rounded-xl border-2 p-6 shadow-xl transition-all ease-in-out md:col-span-6 xl:col-span-6 xl:col-start-2"
-                onMouseEnter={() => setIsCliHovering(true)}
-                onMouseLeave={() => setIsCliHovering(false)}
-                ref={ref}
-                initial={{ opacity: 0, y: 50 }}
-                animate={
-                  isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 50 }
-                }
-                transition={{ duration: 0.5, delay: 0.5 }}
-                whileHover={{
-                  scale: 1.02,
-                  borderColor: "rgba(231, 138, 83, 0.6)",
-                  boxShadow: "0 0 30px rgba(231, 138, 83, 0.2)",
-                }}
-                style={{ transition: "all 0s ease-in-out" }}
-              >
-                <div className="flex flex-col gap-4">
-                  <h3 className="text-2xl leading-none font-semibold tracking-tight">
-                    BLOCKCHAIN-SECURED INVOICE
-                  </h3>
-                  <div className="text-md text-muted-foreground flex flex-col gap-2 text-sm">
-                    <p className="max-w-[460px]">
-                      We secure invoice hashes on the blockchain to prevent
-                      tampering and ITC fraud, ensuring transparent and reliable GST compliance.
-                    </p>
-                  </div>
-                </div>
-                <div className="pointer-events-none flex grow items-center justify-center select-none relative">
-                  <div
-                    className="relative w-full h-[400px] rounded-xl overflow-hidden"
-                    style={{ borderRadius: "20px" }}
-                  >
-                    {/* Background Image */}
-                    <div className="absolute inset-0">
-                      <img
-                        src="https://framerusercontent.com/images/UjqUIiBHmIcSH9vos9HlG2BF4bo.png"
-                        alt="Arrow-CoreExchange"
-                        className="w-full h-full object-cover rounded-xl"
-                      />
-                    </div>
-
-                    {/* Animated SVG Connecting Lines */}
-                    <motion.div
-                      className="absolute inset-0 flex items-center justify-center"
-                      initial={{ opacity: 0 }}
-                      animate={isCliHovering ? { opacity: 1 } : { opacity: 0 }}
-                      transition={{ duration: 0.5 }}
-                    >
-                      <svg
-                        width="100%"
-                        height="100%"
-                        viewBox="0 0 121 94"
-                        className="absolute"
-                      >
-                        <motion.path
-                          d="M 60.688 1.59 L 60.688 92.449 M 60.688 92.449 L 119.368 92.449 M 60.688 92.449 L 1.414 92.449"
-                          stroke="rgb(255,222,213)"
-                          fill="transparent"
-                          strokeDasharray="2 2"
-                          initial={{ pathLength: 0 }}
-                          animate={
-                            isCliHovering
-                              ? { pathLength: 1 }
-                              : { pathLength: 0 }
-                          }
-                          transition={{
-                            duration: 2,
-                            ease: "easeInOut",
-                          }}
-                        />
-                      </svg>
-                      <svg
-                        width="100%"
-                        height="100%"
-                        viewBox="0 0 121 94"
-                        className="absolute"
-                      >
-                        <motion.path
-                          d="M 60.688 92.449 L 60.688 1.59 M 60.688 1.59 L 119.368 1.59 M 60.688 1.59 L 1.414 1.59"
-                          stroke="rgb(255,222,213)"
-                          fill="transparent"
-                          strokeDasharray="2 2"
-                          initial={{ pathLength: 0 }}
-                          animate={
-                            isCliHovering
-                              ? { pathLength: 1 }
-                              : { pathLength: 0 }
-                          }
-                          transition={{
-                            duration: 2,
-                            delay: 0.5,
-                            ease: "easeInOut",
-                          }}
-                        />
-                      </svg>
-                    </motion.div>
-
-                    {/* Animated Purple Blur Effect */}
-                    <motion.div
-                      className="absolute top-1/2 left-1/2 w-16 h-16 bg-purple-500 rounded-full blur-[74px] opacity-65 transform -translate-x-1/2 -translate-y-1/2"
-                      initial={{ scale: 1 }}
-                      animate={
-                        isCliHovering
-                          ? { scale: [1, 1.342, 1, 1.342] }
-                          : { scale: 1 }
-                      }
-                      transition={{
-                        duration: 3,
-                        ease: "easeInOut",
-                        repeat: isCliHovering ? Number.POSITIVE_INFINITY : 0,
-                        repeatType: "loop",
-                      }}
-                    />
-
-                    {/* Main Content Container with Staggered Animations */}
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <div className="flex items-center gap-8">
-                        {/* Left Column */}
-                        <div className="flex flex-col gap-3">
-                          {["ITC CLAIMS ", "FETCH GSTR-2B", "CLUSTERING"].map(
-                            (item, index) => (
-                              <motion.div
-                                key={`left-${index}`}
-                                className="bg-white rounded px-3 py-2 flex items-center gap-2 text-black text-sm font-medium shadow-sm"
-                                initial={{ opacity: 1, x: 0 }}
-                                animate={
-                                  isCliHovering ? { x: [-20, 0] } : { x: 0 }
-                                }
-                                transition={{
-                                  duration: 0.5,
-                                  delay: index * 0.1,
-                                }}
-                                whileHover={{ scale: 1.05 }}
-                              >
-                                <div className="w-4 h-4 flex items-center justify-center">
-                                  {index === 0 && (
-                                    <span className="text-xs">📄</span>
-                                  )}
-                                  {index === 1 && (
-                                    <span className="text-xs">💰</span>
-                                  )}
-                                  {index === 2 && (
-                                    <span className="text-xs">🏢</span>
-                                  )}
-                                </div>
-                                {item}
-                              </motion.div>
-                            )
-                          )}
-                        </div>
-
-                        {/* Center Logo */}
-                        <motion.div
-                          className="w-16 h-16 border border-gray-300 rounded-lg overflow-hidden shadow-lg"
-                          initial={{ opacity: 1, scale: 1 }}
-                          animate={
-                            isCliHovering
-                              ? { scale: [1, 1.1, 1] }
-                              : { scale: 1 }
-                          }
-                          transition={{ duration: 0.6, ease: "easeOut" }}
-                          whileHover={{ scale: 1.1, rotate: 5 }}
-                        >
-                          <img
-                            src="https://framerusercontent.com/images/q43ivjLz67lXhWf6TKfLIh0FY.png"
-                            alt="Logo"
-                            className="w-full h-full object-cover"
-                          />
-                        </motion.div>
-
-                        {/* Right Column */}
-                        <div className="flex flex-col gap-3">
-                          {[
-                            "AI ASSISTANT",
-                            "CRYPTOGRAPHIC",
-                            "RECONCILITION",
-                          ].map((item, index) => (
-                            <motion.div
-                              key={`right-${index}`}
-                              className="bg-white rounded px-3 py-2 flex items-center gap-2 text-black text-sm font-medium shadow-sm"
-                              initial={{ opacity: 1, x: 0 }}
-                              animate={
-                                isCliHovering ? { x: [20, 0] } : { x: 0 }
-                              }
-                              transition={{
-                                duration: 0.5,
-                                delay: index * 0.1,
-                              }}
-                              whileHover={{ scale: 1.05 }}
-                            >
-                              <div className="w-4 h-4 flex items-center justify-center">
-                                {index === 0 && (
-                                  <span className="text-xs">👥</span>
-                                )}
-                                {index === 1 && (
-                                  <span className="text-xs">💳</span>
-                                )}
-                                {index === 2 && (
-                                  <span className="text-xs">👨‍⚕️</span>
-                                )}
-                              </div>
-                              {item}
-                            </motion.div>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Animated Circular Border */}
-                    <motion.div
-                      className="absolute inset-0 flex items-center justify-center"
-                      initial={{ opacity: 0 }}
-                      animate={isCliHovering ? { opacity: 1 } : { opacity: 0 }}
-                      transition={{ duration: 0.5 }}
-                    >
-                      <svg
-                        width="350"
-                        height="350"
-                        viewBox="0 0 350 350"
-                        className="opacity-40"
-                      >
-                        <motion.path
-                          d="M 175 1.159 C 271.01 1.159 348.841 78.99 348.841 175 C 348.841 271.01 271.01 348.841 175 348.841 C 78.99 348.841 1.159 271.01 1.159 175 C 1.159 78.99 78.99 1.159 175 1.159 Z"
-                          stroke="rgba(255, 255, 255, 0.38)"
-                          strokeWidth="1.16"
-                          fill="transparent"
-                          strokeDasharray="4 4"
-                          initial={{ pathLength: 0, rotate: 0 }}
-                          animate={
-                            isCliHovering
-                              ? { pathLength: 1, rotate: 360 }
-                              : { pathLength: 0, rotate: 0 }
-                          }
-                          transition={{
-                            pathLength: { duration: 3, ease: "easeInOut" },
-                            rotate: {
-                              duration: 20,
-                              repeat: isCliHovering
-                                ? Number.POSITIVE_INFINITY
-                                : 0,
-                              ease: "linear",
-                            },
-                          }}
-                        />
-                      </svg>
-                    </motion.div>
-                  </div>
-                </div>
-              </motion.div>
-
-              {/* Global */}
-              <motion.div
-                className="group border-secondary/40 text-card-foreground relative col-span-12 flex flex-col overflow-hidden rounded-xl border-2 p-6 shadow-xl transition-all ease-in-out md:col-span-6 xl:col-span-6 xl:col-start-8"
+                className="group border-secondary/40 text-card-foreground relative col-span-12 flex flex-col overflow-hidden rounded-xl border-2 p-6 shadow-xl"
                 onMouseEnter={() => setIsHovering(true)}
                 onMouseLeave={() => setIsHovering(false)}
-                ref={ref}
-                initial={{ opacity: 0, y: 50 }}
-                animate={
-                  isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 50 }
-                }
-                transition={{ duration: 0.5, delay: 0.5 }}
-                whileHover={{
-                  scale: 1.02,
-                  borderColor: "rgba(231, 138, 83, 0.6)",
-                  boxShadow: "0 0 30px rgba(231, 138, 83, 0.2)",
-                }}
-                style={{ transition: "all 0s ease-in-out" }}
+                initial={{ opacity: 0, y: 40 }}
+                animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 40 }}
+                transition={{ duration: 0.5, delay: 0.7 }}
               >
                 <div className="flex flex-col gap-4">
-                  <h3 className="text-2xl leading-none font-semibold tracking-tight">
-                    SCALABLIITY
+                  <h3 className="text-2xl leading-none font-semibold tracking-tight uppercase">
+                    Anchored on a public ledger
                   </h3>
-                  <div className="text-md text-muted-foreground flex flex-col gap-2 text-sm">
-                    <p className="max-w-[460px]">
-                      Instantly spin up multiple container instances to handle
-                      spikes in invoice processing volume without downtime.
-                    </p>
-                  </div>
+                  <p className="text-muted-foreground max-w-[560px] text-sm leading-relaxed">
+                    Audit-chain checkpoints are committed to Solana devnet, so
+                    the record of who holds what — and who was allowed to change
+                    it — is verifiable outside BlockLedger itself. Where network
+                    credentials are not configured, the platform falls back to a
+                    clearly-labelled local simulation rather than pretending an
+                    anchor exists.
+                  </p>
                 </div>
-                <div className="flex min-h-[300px] grow items-start justify-center select-none">
-                  <h1 className="mt-8 text-center text-5xl leading-[100%] font-semibold sm:leading-normal lg:mt-12 lg:text-6xl">
-                    <span className='bg-background relative mt-3 inline-block w-fit rounded-md border px-1.5 py-0.5 before:absolute before:top-0 before:left-0 before:z-10 before:h-full before:w-full before:bg-[url("/noise.gif")] before:opacity-[0.09] before:content-[""]'>
+                <div className="flex min-h-[320px] grow items-start justify-center select-none">
+                  <h3 className="mt-8 text-center text-5xl leading-[100%] font-semibold sm:leading-normal lg:mt-12 lg:text-6xl">
+                    <span className="bg-background relative mt-3 inline-block w-fit rounded-md border px-1.5 py-0.5">
                       <ScrambleHover
-                        text="Global"
+                        text="Verifiable"
                         scrambleSpeed={70}
                         maxIterations={20}
                         useOriginalCharsOnly={false}
@@ -370,9 +214,9 @@ export default function Features() {
                         characters="abcdefghijklmnopqrstuvwxyz!@#$%^&*()_+-=[]{}|;':\,./<>?"
                       />
                     </span>
-                  </h1>
+                  </h3>
                   <div className="absolute top-64 z-10 flex items-center justify-center">
-                    <div className="w-[400px] h-[400px]">
+                    <div className="h-[400px] w-[400px]">
                       <Suspense
                         fallback={
                           <div className="bg-secondary/20 h-[400px] w-[400px] animate-pulse rounded-full"></div>
@@ -390,97 +234,6 @@ export default function Features() {
                   <div className="absolute top-1/2 w-full translate-y-20 scale-x-[1.2] opacity-70 transition-all duration-1000 group-hover:translate-y-8 group-hover:opacity-100">
                     <div className="from-primary/50 to-primary/0 absolute left-1/2 h-[256px] w-[60%] -translate-x-1/2 scale-[2.5] rounded-[50%] bg-radial from-10% to-60% opacity-20 sm:h-[512px] dark:opacity-100"></div>
                     <div className="from-primary/30 to-primary/0 absolute left-1/2 h-[128px] w-[40%] -translate-x-1/2 scale-200 rounded-[50%] bg-radial from-10% to-60% opacity-20 sm:h-[256px] dark:opacity-100"></div>
-                  </div>
-                </div>
-              </motion.div>
-
-              {/* Smart Components */}
-              <motion.div
-                className="group border-secondary/40 text-card-foreground relative col-span-12 flex flex-col overflow-hidden rounded-xl border-2 p-6 shadow-xl transition-all ease-in-out md:col-span-6 xl:col-span-6 xl:col-start-2"
-                onMouseEnter={() => setIsFeature3Hovering(true)}
-                onMouseLeave={() => setIsFeature3Hovering(false)}
-                initial={{ opacity: 0, y: 50 }}
-                animate={
-                  isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 50 }
-                }
-                transition={{ duration: 0.5, delay: 1.0 }}
-                whileHover={{
-                  scale: 1.02,
-                  borderColor: "rgba(231, 138, 83, 0.5)",
-                  boxShadow: "0 0 30px rgba(231, 138, 83, 0.2)",
-                }}
-                style={{ transition: "all 0s ease-in-out" }}
-              >
-                <div className="flex flex-col gap-4">
-                  <h3 className="text-2xl leading-none font-semibold tracking-tight">
-                    SMART AI ASSISTANT
-                  </h3>
-                  <div className="text-md text-muted-foreground flex flex-col gap-2 text-sm">
-                    <p className="max-w-[460px]">
-                      Intelligent components that adapt to your needs with
-                      built-in animations and interactions.
-                    </p>
-                  </div>
-                </div>
-                <div className="flex grow items-center justify-center select-none relative min-h-[300px] p-4">
-                  <div className="w-full max-w-lg">
-                    <div className="relative rounded-2xl overflow-hidden">
-                      <img
-                        src="/ai-assitant.png"
-                        alt="Smart AI Assistant Interface"
-                        className="w-full h-full object-cover rounded-2xl"
-                      />
-                    </div>
-                  </div>
-                </div>
-              </motion.div>
-
-              {/* Dynamic Layouts */}
-              <motion.div
-                className="group border-secondary/40 text-card-foreground relative col-span-12 flex flex-col overflow-hidden rounded-xl border-2 p-6 shadow-xl transition-all ease-in-out md:col-span-6 xl:col-span-6 xl:col-start-8"
-                onMouseEnter={() => setIsFeature4Hovering(true)}
-                onMouseLeave={() => setIsFeature4Hovering(false)}
-                initial={{ opacity: 0, y: 50 }}
-                animate={
-                  isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 50 }
-                }
-                transition={{ duration: 0.5, delay: 1.0 }}
-                whileHover={{
-                  rotateY: 5,
-                  rotateX: 2,
-                  boxShadow: "0 20px 40px rgba(231, 138, 83, 0.3)",
-                  borderColor: "rgba(231, 138, 83, 0.6)",
-                }}
-                style={{ transition: "all 0s ease-in-out" }}
-              >
-                <div className="flex flex-col gap-4">
-                  <h3 className="text-2xl leading-none font-semibold tracking-tight">
-                    EARLY MISMATCH ALERTS
-                  </h3>
-                  <div className="text-md text-muted-foreground flex flex-col gap-2 text-sm">
-                    <p className="max-w-[460px]">
-                      prevents itc blockage and cash flow disruption.{" "}
-                    </p>
-                  </div>
-                </div>
-                <div className="flex grow items-center justify-center select-none relative min-h-[300px] p-4">
-                  <div className="relative w-full max-w-lg">
-                    <div className="relative w-full overflow-hidden rounded-xl border border-gray-800/60 bg-black/30">
-                      <div className="aspect-video">
-                        <iframe
-                          src="https://my.spline.design/perisoft3dphonesoftwaredevelopment-zfPSkBHUsRUsnn33qBYfOW1W/"
-                          frameBorder="0"
-                          width="100%"
-                          height="100%"
-                          className="h-full w-full"
-                          title="ITC Fraud Visualization"
-                          allow="xr-spatial-tracking; accelerometer; magnetometer; gyroscope;"
-                          allowFullScreen
-                          loading="lazy"
-                        />
-                      </div>
-                    </div>
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent rounded-lg"></div>
                   </div>
                 </div>
               </motion.div>

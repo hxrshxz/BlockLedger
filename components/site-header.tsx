@@ -14,30 +14,23 @@ export function SiteHeader() {
     switch (pathname) {
       case "/dashboard":
         return "Dashboard"
-      case "/ai":
-        return "AI Accountant"
+      case "/identity":
+        return "Identity Registry"
+      case "/assets":
+        return "Asset Registry"
+      case "/access-control":
+        return "Access Control"
+      case "/audit":
+        return "Audit Trail"
       case "/wallet":
         return "Wallet"
-      case "/transactions":
-        return "Transactions"
-      case "/ocr":
-        return "OCR Processing"
-      case "/analytics":
-        return "Analytics"
-      case "/reports":
-        return "Reports"
       case "/settings":
         return "Settings"
-      case "/gst":
-        return "GST Assistant"
-      case "/invoices":
-        return "Invoices"
-      case "/portfolio":
-        return "Portfolio"
-      case "/goals":
-        return "Goals"
       default:
-        // Fallback for dynamic routes or unknown paths
+        // `/assets/BLKL-000123` and other dynamic routes.
+        if (pathname.startsWith("/assets/")) {
+          return `Asset ${pathname.split("/")[2] ?? ""}`.trim()
+        }
         const segments = pathname.split('/').filter(Boolean)
         if (segments.length > 0) {
           return segments[0].charAt(0).toUpperCase() + segments[0].slice(1)

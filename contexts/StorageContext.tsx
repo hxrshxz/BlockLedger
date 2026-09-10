@@ -26,7 +26,7 @@ const StorageContext = createContext<StorageContextValue | undefined>(
   undefined
 );
 
-const STORAGE_KEY = "cyfuture.storage.latest";
+const STORAGE_KEY = "blockledger.storage.latest";
 
 export function StorageProvider({ children }: { children: React.ReactNode }) {
   const [state, setState] = useState<StorageState>({

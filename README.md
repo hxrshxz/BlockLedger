@@ -1,548 +1,224 @@
-# CyFuture AI - Blockchain-Secured AI Accountant
+# BlockLedger — Blockchain-Based Secure Platform for Identity, Access Control and Digital Asset Management
 
-[![Next.js](https://img.shields.io/badge/Next.js-16.1.1-black)](https://nextjs.org/)
-[![React](https://img.shields.io/badge/React-19-blue)](https://reactjs.org/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5-blue)](https://www.typescriptlang.org/)
-[![Solana](https://img.shields.io/badge/Solana-Web3.js-purple)](https://solana.com/)
-[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4.1.9-38B2AC)](https://tailwindcss.com/)
+## 1. Project Information
 
-## 🚀 Overview
+- **Project Title:** BlockLedger — Blockchain-Based Secure Platform for Identity, Access Control and Digital Asset Management
+- **PS ID:** 26125
+- **PS Title:** Blockchain-Based Secure Platform for Identity, Access Control, and Digital Asset Management
+- **Organisation:** Bharat Electronics Limited (BEL)
+- **Category:** Software
+- **Theme:** Blockchain & Cybersecurity
 
-CyFuture AI is a cutting-edge, AI-powered financial platform that revolutionizes accounting and GST reconciliation through the power of blockchain technology and artificial intelligence. The platform combines advanced OCR capabilities, cryptographic verification, and decentralized storage to create an immutable, tamper-proof audit trail for all financial documents.
+## 2. Problem Statement
 
-### Key Highlights
+Defence and public-sector organisations such as BEL run identity and asset management on centralised directories and document stores. That design has three structural weaknesses:
 
-- **AI-Driven Automation**: Leverages Google Gemini AI for intelligent invoice data extraction
-- **Blockchain Security**: Utilizes Solana blockchain for immutable transaction records
-- **Decentralized Storage**: Stores documents on IPFS (InterPlanetary File System) for permanent, distributed access
-- **GST Reconciliation**: Automated GST compliance and reconciliation tools
-- **Real-time Analytics**: Interactive dashboards with financial insights
-- **Multi-wallet Support**: Integrates with major Solana wallets (Phantom, Backpack, etc.)
+1. **Single point of failure.** One compromised directory administrator can mint, escalate or delete any identity in the organisation. There is no independent record of what happened, because the same administrator controls the log.
+2. **Identity theft and impersonation.** Credentials are bearer secrets held by a central party. Whoever obtains the store obtains every identity in it.
+3. **Unverifiable asset provenance.** A drawing, firmware image or certificate can be modified after approval, and a downstream consumer has no cryptographic way to prove which bytes were the approved ones.
 
-## ✨ Features
+An auditor therefore cannot independently prove that a log has not been altered after the fact.
 
-### 🤖 AI-Powered OCR Processing
+## 3. Proposed Solution
 
-- **Intelligent Data Extraction**: Automatically extracts invoice details including:
-  - Invoice numbers and dates
-  - Vendor and buyer information
-  - GST/GSTIN details
-  - Line items with quantities and prices
-  - Tax calculations and total amounts
-- **Multi-format Support**: Processes JPG, PNG, and WebP images
-- **Confidence Scoring**: Provides accuracy metrics for extracted data
-- **Editable Results**: Review and modify extracted data before blockchain submission
-- **Batch Processing Ready**: Architecture supports future multi-document processing
+BlockLedger replaces the trusted central record with cryptographic evidence:
 
-### 🔐 Blockchain Integration
+- Every actor is a **decentralised identifier** (`did:blkl:sol:<pubkey>`) with a W3C DID Document, controlled by a keypair rather than by a directory row. The DID Document is pinned to IPFS, so the identity record is content-addressed and cannot be silently edited.
+- Every asset is a **non-fungible token** (`BLKL-000123`) whose metadata commits to a SHA-256 digest of the underlying file. Change one byte and the digest no longer matches.
+- Every privileged action is gated by a **contract-style permission check** that reverts with an explicit, Solidity-style reason instead of silently succeeding.
+- Every state change appends to a **hash-chained audit log** in which each entry commits to the previous one, so retroactive edits are detectable in a single pass. Entries are anchored to the **Solana devnet** as real signed memo transactions when a wallet is connected.
 
-- **Solana Blockchain**: Fast, low-cost transactions with cryptographic security
-- **Immutable Records**: All transactions permanently recorded on-chain
-- **Wallet Integration**: Seamless connection with Solana wallet adapters
-- **Transaction Tracking**: Real-time transaction status and confirmation
-- **Cryptographic Verification**: Every document hash is cryptographically secured
+### Honesty note on the prototype
 
-### 📦 IPFS Storage
+This is a hackathon prototype and the repository is explicit about what is real versus simulated:
 
-- **Decentralized Storage**: Documents stored on IPFS via Pinata
-- **Permanent Links**: Content-addressed storage ensures data permanence
-- **Gateway Access**: Multiple IPFS gateways for reliable retrieval
-- **Fallback Mechanisms**: Automatic failover to alternative IPFS providers
-- **File Integrity**: Content hashing ensures document authenticity
+- **Real:** Solana devnet wallet connection, real signed memo transactions used to anchor audit entries (`hooks/useSolanaAction.ts`), and real IPFS pinning via Pinata (`hooks/useIpfs.ts`).
+- **Simulated:** the smart-contract layer itself is implemented in TypeScript (`lib/contracts/`) rather than deployed to a chain, so the demo runs with no contract deployment and no additional infrastructure.
 
-### 📊 Dashboard & Analytics
+Every record carries an `anchorMode` field of either `onchain` or `simulated` and is badged truthfully in the UI. **No transaction signature or IPFS CID is ever fabricated.**
 
-- **Real-time Metrics**: Live financial data visualization
-- **Interactive Charts**: Powered by Recharts for dynamic data exploration
-- **Transaction History**: Complete audit trail of all operations
-- **Invoice Management**: Centralized invoice tracking and status monitoring
-- **Portfolio Overview**: Comprehensive financial health indicators
-- **GST Reports**: Automated GST reconciliation and compliance reports
+## 4. Key Features
 
-### 🎨 Modern UI/UX
+| Pillar | What BlockLedger does |
+|---|---|
+| Decentralised identity | Registers, resolves, revokes and reactivates DIDs. Each identity has a W3C-shaped DID Document with a verification method derived from its public key, pinned to IPFS. |
+| NFT-based asset ownership | Mints an ERC-721-style token per asset, with an owner DID, a content digest, and IPFS-pinned metadata. Supports transfer with retained ownership history. |
+| Smart-contract governance | `IdentityRegistry`, `AssetNFT` and `AccessControl` expose a strict, revert-on-failure API. A caller cannot bypass a check by ignoring a return value. |
+| Role-based access control | Four roles (`ADMIN`, `MANAGER`, `AUDITOR`, `USER`) mapped through an explicit permission matrix. Route-level guards enforce the same matrix in the UI. |
+| Immutable audit trail | Append-only, hash-linked log of every mutation, with one-click integrity verification that reports the exact index at which the chain breaks. |
+| Tamper detection | Detects field mutation, entry reordering, entry deletion and actor forgery, and reports the exact broken index. |
+| On-chain anchoring | Anchors audit entries to Solana devnet as real signed memo transactions, linked to a block explorer. |
 
-- **Responsive Design**: Fully optimized for desktop, tablet, and mobile
-- **Dark Mode**: System-aware theme switching
-- **Smooth Animations**: Framer Motion powered transitions
-- **Accessibility**: WCAG compliant with keyboard navigation
-- **Interactive Components**: Radix UI primitives for robust interactions
-- **Loading States**: Multi-step loaders with progress indicators
+## 5. Technology Stack
 
-### 🔒 Security Features
+- **Frontend:** Next.js 15 (App Router), React 19, TypeScript
+- **Styling / UI:** Tailwind CSS v4, shadcn/ui, Framer Motion
+- **Blockchain:** Solana (devnet), `@solana/web3.js`, Solana Wallet Adapter
+- **Decentralised storage:** IPFS via Pinata
+- **Identity:** W3C Decentralized Identifiers (DID)
+- **Cryptography:** SHA-256 hash chaining (Web Crypto API)
+- **Deployment:** Vercel
 
-- **Client-side Authentication**: Secure user session management
-- **Wallet-based Auth**: Cryptographic authentication via Solana wallets
-- **API Key Rotation**: Support for multiple Gemini API keys
-- **Error Boundaries**: Graceful error handling and recovery
-- **Service Worker Guards**: Enhanced PWA security
-- **Environment Isolation**: Strict environment variable management
+## 6. Architecture
 
-## 🏗️ Architecture
+See [docs/architecture.md](docs/architecture.md).
 
-### Technology Stack
-
-#### Frontend Framework
-- **Next.js 16.1.1**: React framework with App Router
-- **React 19**: Latest React with concurrent features
-- **TypeScript 5**: Strong typing for enhanced development
-
-#### Blockchain & Web3
-- **Solana Web3.js**: Solana blockchain interaction
-- **Wallet Adapter**: Multi-wallet support (Phantom, Backpack, etc.)
-- **SPL Token**: Solana token program integration
-
-#### AI & Machine Learning
-- **Google Gemini AI**: Advanced vision and language models
-- **OCR Service**: Custom invoice data extraction pipeline
-- **Multi-key Rotation**: Load balancing across API keys
-
-#### Storage & Data
-- **IPFS/Pinata**: Decentralized file storage
-- **LocalStorage**: Client-side state persistence
-- **Context API**: Global state management
-
-#### UI & Styling
-- **Tailwind CSS 4.1.9**: Utility-first CSS framework
-- **Radix UI**: Accessible component primitives
-- **Framer Motion**: Advanced animations
-- **Lucide Icons**: Modern icon library
-- **Custom Components**: 50+ custom UI components
-
-#### Development Tools
-- **ESLint**: Code quality and consistency
-- **PostCSS**: CSS transformation
-- **pnpm**: Fast, efficient package manager
-
-### Project Structure
-
-```
-cyfuture-landingpage/
-├── app/                          # Next.js app directory
-│   ├── ai/                       # AI features and chat interface
-│   ├── analytics/                # Analytics dashboard
-│   ├── dashboard/                # Main dashboard
-│   ├── goals/                    # Financial goals tracking
-│   ├── gst/                      # GST reconciliation
-│   ├── invoices/                 # Invoice management
-│   ├── login/                    # Authentication pages
-│   ├── ocr/                      # OCR processing interface
-│   ├── portfolio/                # Portfolio management
-│   ├── reports/                  # Financial reports
-│   ├── settings/                 # User settings
-│   ├── signup/                   # User registration
-│   ├── transactions/             # Transaction history
-│   ├── wallet/                   # Wallet management
-│   ├── layout.tsx               # Root layout
-│   ├── page.tsx                 # Landing page
-│   └── globals.css              # Global styles
-│
-├── components/                   # React components
-│   ├── ui/                      # Reusable UI components
-│   ├── ai/                      # AI-specific components
-│   ├── cyfuture/                # Platform-specific components
-│   ├── home/                    # Landing page components
-│   ├── magicui/                 # Magic UI library
-│   ├── AIAccountant.tsx         # AI accountant interface
-│   ├── AppLayout.tsx            # Application layout
-│   ├── AppNavigation.tsx        # Navigation component
-│   ├── ExtractedDataDisplay.tsx # OCR results display
-│   ├── HeroSection.tsx          # Landing hero
-│   ├── IPFSLinks.tsx            # IPFS link components
-│   ├── NavBar.tsx               # Navigation bar
-│   ├── OCRUpload.tsx            # OCR upload interface
-│   ├── TransactionResult.tsx    # Transaction display
-│   ├── WalletProvider.tsx       # Wallet context provider
-│   └── [50+ more components]
-│
-├── contexts/                     # React contexts
-│   ├── AuthContext.tsx          # Authentication state
-│   └── StorageContext.tsx       # Storage state management
-│
-├── hooks/                        # Custom React hooks
-│   ├── useIpfs.ts               # IPFS operations
-│   ├── useIpfsFallback.ts       # IPFS with fallbacks
-│   ├── useSolanaAction.ts       # Solana interactions
-│   ├── useSpeechRecognition.ts  # Voice input
-│   └── use-mobile.ts            # Mobile detection
-│
-├── lib/                          # Utility libraries
-│   ├── fonts.ts                 # Font configurations
-│   ├── gemini.ts                # Gemini AI client
-│   ├── ocr-config.ts            # OCR configuration
-│   ├── ocr-service.ts           # OCR service layer
-│   ├── theme.ts                 # Theme utilities
-│   └── utils.ts                 # General utilities
-│
-├── public/                       # Static assets
-│   └── [images, icons, etc.]
-│
-├── styles/                       # Additional styles
-│
-├── types/                        # TypeScript definitions
-│
-├── .env.local                    # Environment variables (not in repo)
-├── .gitignore                   # Git ignore rules
-├── components.json              # Component configuration
-├── Dockerfile                   # Docker configuration
-├── IPFS_FIX_GUIDE.md           # IPFS troubleshooting
-├── next.config.mjs             # Next.js configuration
-├── nginx.conf                  # Nginx configuration
-├── OCR_IMPLEMENTATION.md       # OCR documentation
-├── package.json                # Dependencies
-├── pnpm-lock.yaml              # Lock file
-├── postcss.config.mjs          # PostCSS configuration
-├── tailwind.config.js          # Tailwind configuration
-└── tsconfig.json               # TypeScript configuration
+```text
+User + Solana Wallet
+  |
+  v
+Next.js Frontend (App Router)
+  |  /dashboard /identity /assets /access-control /audit /wallet
+  v
+Contract Layer  (AccessControl / IdentityRegistry / AssetNFT)
+  |
+  +----> Identity Registry ------> DID Document ----> IPFS (Pinata)
+  |
+  +----> Asset Registry ---------> NFT Metadata ----> IPFS (Pinata)
+  |
+  v
+Hash-Chained Audit Ledger
+  |
+  v
+Solana Devnet Anchor (signed memo transaction)
 ```
 
-### Data Flow Architecture
+## 7. Repository Structure
 
+```text
+BlockLedger/
+├── README.md
+├── SUBMISSION_GUIDE.md
+├── submission/
+│   ├── PRESENTATION.md
+│   └── DEMO.md
+├── app/                      # Next.js App Router pages
+│   ├── page.tsx              # Landing page
+│   ├── dashboard/
+│   ├── identity/
+│   ├── assets/
+│   ├── access-control/
+│   ├── audit/
+│   ├── wallet/
+│   ├── settings/
+│   ├── login/
+│   └── signup/
+├── lib/
+│   ├── blockchain/           # DID, hash chaining, ledger, persistence, seed
+│   └── contracts/            # AccessControl / IdentityRegistry / AssetNFT
+├── contexts/                 # Auth, Chain, Ledger, Storage providers
+├── hooks/                    # useSolanaAction (real devnet), useIpfs (real Pinata)
+├── components/
+├── docs/
+│   └── architecture.md
+├── assets/
+│   └── screenshots/
+├── package.json
+├── .gitignore
+└── LICENSE
 ```
-User Upload → OCR Processing → Data Extraction → User Review
-                                                      ↓
-                                                  Validation
-                                                      ↓
-                                    ┌─────────────────┴─────────────────┐
-                                    ↓                                   ↓
-                              IPFS Storage                      Solana Blockchain
-                              (Document)                        (Metadata Hash)
-                                    ↓                                   ↓
-                              Content Hash  ←────────────────── Transaction Signature
-                                    ↓
-                              Verification & Retrieval
-```
 
-## 🚦 Getting Started
+### What goes where?
 
-### Prerequisites
+| Item | Location |
+|---|---|
+| Source code | `app/`, `lib/`, `components/`, `contexts/`, `hooks/` |
+| Architecture / technical documentation | `docs/` |
+| Project screenshots | `assets/screenshots/` |
+| Final PPT / presentation | `submission/` |
+| Demo video link | `submission/DEMO.md` |
+| Project overview | `README.md` |
 
-- **Node.js**: v18 or higher
-- **pnpm**: v8 or higher (or npm/yarn)
-- **Solana Wallet**: Phantom, Backpack, or compatible wallet
-- **API Keys**:
-  - Google Gemini API key
-  - Pinata JWT token (for IPFS)
+## 8. Final Presentation
 
-### Installation
+See [submission/PRESENTATION.md](submission/PRESENTATION.md).
 
-1. **Clone the repository**
+## 9. Demo Video
+
+See [submission/DEMO.md](submission/DEMO.md).
+
+## 10. Screenshots
+
+Screenshots are in [`assets/screenshots/`](assets/screenshots/).
+
+![BlockLedger landing page](assets/screenshots/01-landing.png)
+
+## 11. Installation
+
 ```bash
-git clone https://github.com/hxrshxz/Cyfuture-LandingPage.git
-cd Cyfuture-LandingPage
-```
-
-2. **Install dependencies**
-```bash
-pnpm install
-# or
+git clone <YOUR_REPOSITORY_URL>
+cd BlockLedger
 npm install
-# or
-yarn install
 ```
 
-3. **Configure environment variables**
+> This project uses **npm**. `package-lock.json` is the only lockfile — do not mix in `pnpm` or `yarn`.
 
-Create a `.env.local` file in the root directory:
+### Environment variables
 
-```env
-# Google Gemini AI Configuration
-NEXT_PUBLIC_GEMINI_API_KEY_1=your_primary_gemini_api_key
-NEXT_PUBLIC_GEMINI_API_KEY_2=your_secondary_gemini_api_key  # Optional for rotation
-NEXT_PUBLIC_GEMINI_MODEL=gemini-flash-latest                # Recommended for stable quota
+Create a `.env.local` file to enable IPFS pinning. The application runs without it, but pinning will be disabled and records will be marked as simulated.
 
-# IPFS/Pinata Configuration
-NEXT_PUBLIC_PINATA_JWT=your_pinata_jwt_token
-NEXT_PUBLIC_IPFS_GATEWAY=https://gateway.pinata.cloud/ipfs
-
-# Solana Configuration (Optional - defaults to devnet)
-NEXT_PUBLIC_SOLANA_NETWORK=devnet  # or mainnet-beta, testnet
-```
-
-4. **Run the development server**
 ```bash
-pnpm dev
-# or
+NEXT_PUBLIC_PINATA_JWT=<your_pinata_jwt>
+```
+
+No smart contract needs to be deployed and no other API keys are required.
+
+## 12. Run
+
+```bash
 npm run dev
-# or
-yarn dev
 ```
 
-5. **Open your browser**
+Open <http://localhost:3000>.
 
-Navigate to [http://localhost:3000](http://localhost:3000)
+### Demo accounts
 
-### Building for Production
+All demo accounts use the password `password123`.
 
-```bash
-# Build the application
-pnpm build
+| Email | Role | Name |
+|---|---|---|
+| `admin@blockledger.io` | ADMIN | Dr. Ananya Rao |
+| `manager@blockledger.io` | MANAGER | Vikram Iyer |
+| `auditor@blockledger.io` | AUDITOR | R. Krishnamurthy |
+| `user@blockledger.io` | USER | Sandeep Nair |
 
-# Start the production server
-pnpm start
-```
+> These are seeded demo credentials for a local prototype only. They are not real accounts and grant no access to any live system.
 
-### Docker Deployment
+### Suggested review flow
 
-**Note**: The Dockerfile in this repository is currently configured for a Vite-based build but the project uses Next.js. For Docker deployment with Next.js, you have two options:
+1. Sign in as **ADMIN** → register a new identity on `/identity` and watch the DID get issued and pinned.
+2. Switch to **MANAGER** → mint a digital asset on `/assets`, then open its detail page to see the DID binding and IPFS metadata.
+3. Switch to **AUDITOR** → attempt to grant a role on `/access-control` and observe the real contract revert.
+4. Go to `/audit` → run **Verify chain**, then use the tamper controls to break the chain and confirm the verifier reports the exact broken index.
+5. Connect a Solana devnet wallet on `/wallet` to anchor new audit entries as real on-chain memo transactions.
 
-**Option 1: Update the Dockerfile for Next.js**
+## 13. Future Scope
 
-Create a new Dockerfile:
-```dockerfile
-FROM node:20-alpine AS base
+- Deploy the contract layer as real Solana programs (Anchor) so enforcement moves fully on-chain.
+- Replace demo credentials with wallet-native, signature-based authentication.
+- Add Verifiable Credentials on top of the DID layer for cross-organisation attestations.
+- Support hardware wallets and HSM-backed keys for ADMIN accounts.
+- Batch and Merkle-root audit anchoring to reduce transaction cost at scale.
+- Integrate with existing enterprise directories (LDAP / Active Directory) for phased migration.
 
-# Install dependencies only when needed
-FROM base AS deps
-WORKDIR /app
-COPY package.json pnpm-lock.yaml ./
-RUN npm install -g pnpm && pnpm install --frozen-lockfile
+## 14. Team
 
-# Rebuild the source code only when needed
-FROM base AS builder
-WORKDIR /app
-COPY --from=deps /app/node_modules ./node_modules
-COPY . .
-RUN npm install -g pnpm && pnpm build
+**Team name:** `<TEAM_NAME>`
+**Institute:** `<INSTITUTE_NAME>`
 
-# Production image
-FROM base AS runner
-WORKDIR /app
-ENV NODE_ENV production
-COPY --from=builder /app/public ./public
-COPY --from=builder /app/.next/standalone ./
-COPY --from=builder /app/.next/static ./.next/static
+| Name | Role |
+|---|---|
+| `<TEAM_MEMBER_1>` | `<ROLE>` |
+| `<TEAM_MEMBER_2>` | `<ROLE>` |
+| `<TEAM_MEMBER_3>` | `<ROLE>` |
+| `<TEAM_MEMBER_4>` | `<ROLE>` |
+| `<TEAM_MEMBER_5>` | `<ROLE>` |
+| `<TEAM_MEMBER_6>` | `<ROLE>` |
 
-EXPOSE 3000
-ENV PORT 3000
-CMD ["node", "server.js"]
-```
+## Important
 
-Then build and run:
-```bash
-docker build -t cyfuture-ai .
-docker run -p 3000:3000 \
-  -e NEXT_PUBLIC_GEMINI_API_KEY_1=your_key \
-  -e NEXT_PUBLIC_PINATA_JWT=your_jwt \
-  cyfuture-ai
-```
+This repository contains no passwords, API keys, access tokens or `.env` files. The demo account credentials listed above are seeded local prototype data and are intentionally public.
 
-**Option 2: Use the existing Dockerfile**
+## License
 
-If you prefer to use the existing Dockerfile without modifications, ensure your environment variables use the VITE_ prefix during build.
-
-## 🔑 API Keys Setup
-
-### Google Gemini API Key
-
-1. Visit [Google AI Studio](https://makersuite.google.com/app/apikey)
-2. Sign in with your Google account
-3. Click "Create API Key"
-4. Copy the key and add to `.env.local`
-5. (Optional) Create a second key for rotation
-
-**Key Features:**
-- Free tier: 60 requests per minute
-- Multiple keys enable load balancing
-- Automatic rotation prevents rate limiting
-
-### Pinata IPFS Setup
-
-1. Visit [Pinata Dashboard](https://app.pinata.cloud/)
-2. Create an account or sign in
-3. Navigate to "API Keys"
-4. Click "New Key"
-5. Enable required permissions:
-   - ✅ `pinFileToIPFS` - Upload files
-   - ✅ `pinJSONToIPFS` - Upload JSON
-   - ✅ `userPinnedDataTotal` - Check usage
-6. Copy the JWT token and add to `.env.local`
-
-**Troubleshooting:** See [IPFS_FIX_GUIDE.md](IPFS_FIX_GUIDE.md) for detailed troubleshooting
-
-## 📖 Usage Guide
-
-### Invoice Processing Workflow
-
-1. **Connect Wallet**
-   - Click "Connect Wallet" in the dashboard
-   - Select your preferred Solana wallet
-   - Approve the connection
-
-2. **Upload Invoice**
-   - Navigate to Dashboard or OCR page
-   - Drag & drop an invoice image or click to browse
-   - Supported formats: JPG, PNG, WebP (max 20MB)
-
-3. **Review Extracted Data**
-   - AI automatically extracts invoice details
-   - Review all fields for accuracy
-   - Edit any incorrect information
-   - Check validation warnings
-
-4. **Store on Blockchain**
-   - Click "Store on Blockchain"
-   - Confirm transaction in your wallet
-   - Wait for confirmation (typically 1-2 seconds)
-
-5. **View Results**
-   - Access document via IPFS link
-   - View transaction on Solana Explorer
-   - Download or share permanent links
-
-### GST Reconciliation
-
-1. Navigate to the GST section
-2. Upload GST invoices or import from dashboard
-3. Review automated reconciliation reports
-4. Export reports for compliance
-
-### AI Accountant
-
-1. Navigate to AI chat interface
-2. Ask questions about your financial data
-3. Get AI-powered insights and recommendations
-4. Export conversation history
-
-## 🎨 Customization
-
-### Theme Configuration
-
-The platform supports light and dark modes. Customize themes in `tailwind.config.js`:
-
-```javascript
-theme: {
-  extend: {
-    colors: {
-      primary: "hsl(var(--primary))",
-      // Add your custom colors
-    }
-  }
-}
-```
-
-### Component Customization
-
-All components are built with Radix UI and can be customized via:
-- Tailwind utility classes
-- CSS variables in `globals.css`
-- Component props
-
-## 🧪 Testing
-
-```bash
-# Run linter
-pnpm lint
-
-# Type checking
-pnpm build
-```
-
-## 🐳 Deployment
-
-### Vercel (Recommended)
-
-1. Push your code to GitHub
-2. Import project in Vercel
-3. Configure environment variables
-4. Deploy
-
-### Docker
-
-See the "Docker Deployment" section above for detailed containerization instructions.
-
-### Self-Hosted
-
-```bash
-# Build
-pnpm build
-
-# Start the production server
-pnpm start
-```
-
-For standalone deployment:
-```bash
-# Enable standalone output in next.config.mjs
-# Then build and run:
-pnpm build
-node .next/standalone/server.js
-```
-
-## 🔧 Configuration Files
-
-- **next.config.mjs**: Next.js configuration
-- **tailwind.config.js**: Tailwind CSS customization
-- **tsconfig.json**: TypeScript compiler options
-- **components.json**: shadcn/ui component configuration
-- **postcss.config.mjs**: PostCSS plugins
-
-## 📚 Additional Documentation
-
-- [OCR Implementation Guide](OCR_IMPLEMENTATION.md) - Detailed OCR setup and usage
-- [IPFS Troubleshooting](IPFS_FIX_GUIDE.md) - IPFS and Pinata configuration
-
-## 🤝 Contributing
-
-Contributions are welcome! Please follow these guidelines:
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
-
-### Development Guidelines
-
-- Follow TypeScript best practices
-- Use ESLint and Prettier for code formatting
-- Write descriptive commit messages
-- Add comments for complex logic
-- Update documentation for new features
-
-## 🔐 Security
-
-- Never commit `.env.local` or API keys to the repository
-- Use environment variables for all sensitive data
-- Keep dependencies updated
-- Report security vulnerabilities privately
-
-## 📄 License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-## 🙏 Acknowledgments
-
-- **Solana Foundation**: Blockchain infrastructure
-- **Google Gemini AI**: OCR and AI capabilities
-- **Pinata**: IPFS pinning service
-- **Vercel**: Deployment and hosting
-- **Radix UI**: Accessible component primitives
-- **Tailwind CSS**: Utility-first CSS framework
-
-## 📞 Support
-
-For questions, issues, or feature requests:
-
-- 🐛 Issues: [GitHub Issues](https://github.com/hxrshxz/Cyfuture-LandingPage/issues)
-- 💬 Discussions: [GitHub Discussions](https://github.com/hxrshxz/Cyfuture-LandingPage/discussions)
-
-## 🗺️ Roadmap
-
-### Upcoming Features
-
-- [ ] **PDF Support**: OCR processing for PDF documents
-- [ ] **Batch Processing**: Multi-document upload and processing
-- [ ] **Mobile App**: React Native mobile application
-- [ ] **API Endpoints**: REST API for programmatic access
-- [ ] **Multi-language**: Support for additional languages
-- [ ] **Advanced Analytics**: ML-powered financial forecasting
-- [ ] **Team Collaboration**: Multi-user accounts and permissions
-- [ ] **Export Features**: Export to Excel, CSV, and PDF
-- [ ] **Integration**: QuickBooks, Xero, and other accounting software
-- [ ] **Audit Trail**: Enhanced compliance and audit features
-
----
-
-**Built with ❤️ by the CyFuture AI Team**
-
-**GitHub**: [@hxrshxz](https://github.com/hxrshxz)
+Released under the [MIT License](LICENSE).

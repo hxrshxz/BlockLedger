@@ -1,27 +1,19 @@
 "use client"
 
 import * as React from "react"
+import { IconInnerShadowTop } from "@tabler/icons-react"
 import {
-  IconCamera,
-  IconChartBar,
-  IconDashboard,
-  IconDatabase,
-  IconFileAi,
-  IconFileDescription,
-  IconFileWord,
-  IconFolder,
-  IconHelp,
-  IconInnerShadowTop,
-  IconListDetails,
-  IconReport,
-  IconSearch,
-  IconSettings,
-  IconUsers,
-  IconWallet,
-  IconCreditCard,
-} from "@tabler/icons-react"
+  Fingerprint,
+  Gem,
+  HelpCircle,
+  LayoutDashboard,
+  ScrollText,
+  Search,
+  Settings,
+  ShieldCheck,
+  Wallet,
+} from "lucide-react"
 
-import { NavDocuments } from "@/components/nav-documents"
 import { NavMain } from "@/components/nav-main"
 import { NavSecondary } from "@/components/nav-secondary"
 import { NavUser } from "@/components/nav-user"
@@ -38,54 +30,64 @@ import { useAuth } from "@/contexts/AuthContext"
 
 const data = {
   user: {
-    name: "CyFuture User",
-    email: "user@cyfuture.ai", 
+    name: "BlockLedger User",
+    email: "user@blockledger.io",
     avatar: "/placeholder-user.jpg",
   },
   navMain: [
     {
       title: "Dashboard",
       url: "/dashboard",
-      icon: IconDashboard,
+      icon: LayoutDashboard,
     },
     {
-      title: "AI Accountant",
-      url: "/ai",
-      icon: IconFileAi,
+      title: "Identity",
+      url: "/identity",
+      icon: Fingerprint,
+    },
+    {
+      title: "Assets",
+      url: "/assets",
+      icon: Gem,
+    },
+    {
+      title: "Access Control",
+      url: "/access-control",
+      icon: ShieldCheck,
+    },
+    {
+      title: "Audit Trail",
+      url: "/audit",
+      icon: ScrollText,
     },
     {
       title: "Wallet",
       url: "/wallet",
-      icon: IconWallet,
-    },
-    {
-      title: "Transactions",
-      url: "/transactions",
-      icon: IconCreditCard,
+      icon: Wallet,
     },
   ],
   navSecondary: [
     {
       title: "Settings",
       url: "/settings",
-      icon: IconSettings,
+      icon: Settings,
     },
     {
       title: "Get Help",
       url: "#",
-      icon: IconHelp,
+      icon: HelpCircle,
     },
     {
       title: "Search",
       url: "#",
-      icon: IconSearch,
+      icon: Search,
     },
   ],
 }
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { user } = useAuth()
-  
+
   const userData = {
     name: user?.name || data.user.name,
     email: user?.email || data.user.email,
@@ -103,7 +105,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             >
               <a href="/dashboard">
                 <IconInnerShadowTop className="!size-5" />
-                <span className="text-base font-semibold">CyFuture AI</span>
+                <span className="text-base font-semibold">BlockLedger</span>
               </a>
             </SidebarMenuButton>
           </SidebarMenuItem>

@@ -111,9 +111,22 @@ export default function SignupPage() {
             </div>
           </Link>
           <h1 className="text-3xl font-bold text-foreground mb-2">
-            Create account
+            Request BlockLedger access
           </h1>
-          <p className="text-muted-foreground">Join thousands of developers</p>
+          <p className="text-muted-foreground">
+            New accounts start with the USER role and a derived{" "}
+            <span className="font-mono text-xs">did:blkl:sol</span> identifier.
+            An ADMIN must grant anything beyond read access.
+          </p>
+          <p className="mt-3 text-xs text-muted-foreground">
+            Evaluating the demo?{" "}
+            <Link
+              href="/login"
+              className="text-blue-400 underline underline-offset-4"
+            >
+              Use a prepared persona instead →
+            </Link>
+          </p>
         </div>
 
         {/* Signup Form */}

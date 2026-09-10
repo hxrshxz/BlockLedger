@@ -1,6 +1,9 @@
 "use client"
 
-import { IconCirclePlusFilled, IconMail, type Icon } from "@tabler/icons-react"
+import * as React from "react"
+import { IconCirclePlusFilled, IconMail } from "@tabler/icons-react"
+
+type NavIcon = React.ComponentType<{ className?: string }>
 
 import { Button } from "@/components/ui/button"
 import {
@@ -17,7 +20,7 @@ export function NavMain({
   items: {
     title: string
     url: string
-    icon?: Icon
+    icon?: NavIcon
   }[]
 }) {
   return (

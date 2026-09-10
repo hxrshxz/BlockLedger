@@ -1,185 +1,260 @@
 "use client";
 
-import { ProtectedRoute } from "@/contexts/AuthContext";
-import { AppSidebar } from "@/components/app-sidebar";
-import { SiteHeader } from "@/components/site-header";
-import {
-  SidebarInset,
-  SidebarProvider,
-} from "@/components/ui/sidebar";
-import { FocusCards } from "@/components/ui/focus-cards";
-import { useState } from "react";
-import { Wallet, Users } from "lucide-react";
+import * as React from "react";
+import Link from "next/link";
+import { CheckCircle2, Fingerprint, Radio, Wallet } from "lucide-react";
 import { useWallet } from "@solana/wallet-adapter-react";
+import { ProtectedRoute } from "@/contexts/AuthContext";
+import { useChain } from "@/contexts/ChainContext";
+import { AppShell, PageHeading } from "@/components/blockledger/shell";
+import { MonoValue } from "@/components/blockledger/primitives";
+import { FocusCards } from "@/components/ui/focus-cards";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { didFromAddress } from "@/lib/blockchain/did";
+import { explorerAddressUrl } from "@/lib/blockchain/explorer";
+
+const WALLET_OPTIONS = [
+  {
+    id: "phantom",
+    title: "Phantom",
+    image: "/w4.png",
+    description: "The friendly Solana wallet built for everyone",
+    features: ["Easy to use", "Secure", "Mobile friendly"],
+    category: "Recommended",
+    categoryColor: "bg-purple-500/20 text-purple-300",
+    adapterName: "Phantom",
+  },
+  {
+    id: "solflare",
+    title: "Solflare",
+    image: "/w1.png",
+    description: "A comprehensive Solana wallet with advanced features",
+    features: ["Multi-chain support", "NFT storage", "DeFi integration"],
+    category: "Popular",
+    categoryColor: "bg-orange-500/20 text-orange-300",
+    adapterName: "Solflare",
+  },
+  {
+    id: "backpack",
+    title: "Backpack",
+    image: "/w3.png",
+    description: "Modern wallet built for the next generation of Web3",
+    features: ["Social features", "Portfolio tracking", "Cross-chain"],
+    category: "New",
+    categoryColor: "bg-green-500/20 text-green-300",
+    adapterName: "Backpack",
+  },
+  {
+    id: "metamask",
+    title: "MetaMask",
+    image: "/w2.png",
+    description: "Connect via the MetaMask Solana Snap",
+    features: ["Browser extension", "Familiar interface", "Multi-chain"],
+    category: "Ethereum",
+    categoryColor: "bg-blue-500/20 text-blue-300",
+    adapterName: "MetaMask",
+  },
+];
 
 function WalletContent() {
-  const [connectingWallet, setConnectingWallet] = useState<string | null>(null);
+  const [connectingWallet, setConnectingWallet] = React.useState<string | null>(
+    null
+  );
   const { select, wallets, connected, disconnect } = useWallet();
+  const { walletAddress, cluster, isIpfsConfigured } = useChain();
 
-  const walletOptions = [
-    {
-      id: "phantom",
-      title: "Phantom",
-      image: "/w4.png",
-      description: "The friendly Solana wallet built for everyone",
-      features: ["Easy to use", "Secure", "Mobile friendly"],
-      category: "Recommended",
-      categoryColor: "bg-purple-500/20 text-purple-300",
-      adapterName: "Phantom",
-    },
-    {
-      id: "solflare",
-      title: "Solflare",
-      image: "/w1.png",
-      description: "A comprehensive Solana wallet with advanced features",
-      features: ["Multi-chain support", "NFT storage", "DeFi integration"],
-      category: "Popular",
-      categoryColor: "bg-orange-500/20 text-orange-300",
-      adapterName: "Solflare",
-    },
-    {
-      id: "backpack",
-      title: "Backpack",
-      image: "/w3.png",
-      description: "Modern wallet built for the next generation of Web3",
-      features: ["Social features", "Portfolio tracking", "Cross-chain"],
-      category: "New",
-      categoryColor: "bg-green-500/20 text-green-300",
-      adapterName: "Backpack",
-    },
-    {
-      id: "metamask",
-      title: "MetaMask",
-      image: "/w2.png",
-      description: "Connect via MetaMask Solana Snap",
-      features: ["Browser extension", "Familiar interface", "Multi-chain"],
-      category: "Ethereum",
-      categoryColor: "bg-blue-500/20 text-blue-300",
-      adapterName: "MetaMask",
-    },
-  ];
+  const derivedDid = walletAddress ? didFromAddress(walletAddress) : null;
 
   const handleConnectWallet = async (walletId: string) => {
     try {
       setConnectingWallet(walletId);
-      
-      // Find the wallet option
-      const walletOption = walletOptions.find(w => w.id === walletId);
+
+      const walletOption = WALLET_OPTIONS.find((w) => w.id === walletId);
       if (!walletOption) {
         console.error(`Wallet ${walletId} not found`);
         return;
       }
 
-      // Find the corresponding wallet adapter
-      const walletAdapter = wallets.find(
-        wallet => wallet.adapter.name.toLowerCase().includes(walletOption.adapterName.toLowerCase())
+      const walletAdapter = wallets.find((wallet) =>
+        wallet.adapter.name
+          .toLowerCase()
+          .includes(walletOption.adapterName.toLowerCase())
       );
 
       if (walletAdapter) {
-        // If already connected to a different wallet, disconnect first
+        // Switching wallets requires a clean disconnect first.
         if (connected) {
           await disconnect();
-          // Wait a bit for disconnect to complete
-          await new Promise(resolve => setTimeout(resolve, 500));
+          await new Promise((resolve) => setTimeout(resolve, 500));
         }
-
-        // Select and connect to the new wallet
         await select(walletAdapter.adapter.name);
-        
-        // The wallet adapter will handle the connection automatically
-        console.log(`Successfully initiated connection to ${walletOption.title}`);
       } else {
-        // If wallet adapter not found, show error
-        console.error(`${walletOption.title} wallet adapter not found. Please install the ${walletOption.title} browser extension.`);
-        alert(`Please install the ${walletOption.title} browser extension first, then refresh the page.`);
+        alert(
+          `Please install the ${walletOption.title} browser extension first, then refresh the page.`
+        );
       }
     } catch (error) {
-      console.error(`Error connecting to wallet:`, error);
-      alert(`Failed to connect to wallet. Please make sure the wallet extension is installed and try again.`);
+      console.error("Error connecting to wallet:", error);
+      alert(
+        "Failed to connect to wallet. Please make sure the wallet extension is installed and try again."
+      );
     } finally {
       setConnectingWallet(null);
     }
   };
 
   return (
-    <SidebarProvider
-      style={
-        {
-          "--sidebar-width": "calc(var(--spacing) * 72)",
-          "--header-height": "calc(var(--spacing) * 12)",
-        } as React.CSSProperties
-      }
-    >
-      <AppSidebar variant="inset" />
-      <SidebarInset>
-        <SiteHeader />
-        <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
-          <div className="min-h-[100vh] flex-1 rounded-xl bg-muted/50 md:min-h-min">
-            <div className="p-8">
-              {/* Header */}
-              <div className="mb-12">
-                <div className="flex items-center gap-3 mb-4">
-                  <Wallet className="w-8 h-8 text-blue-400" />
-                  <div>
-                    <h2 className="text-2xl font-bold text-white">Connect Your Wallet</h2>
-                    <p className="text-muted-foreground">
-                      Choose your preferred wallet to start using CyFuture AI
-                    </p>
-                  </div>
-                </div>
-                
-                {/* Connection Status */}
-                {connected && (
-                  <div className="mt-4 p-4 bg-green-500/10 border border-green-500/30 rounded-lg">
-                    <div className="flex items-center gap-2 text-green-400">
-                      <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
-                      <span className="text-sm font-medium">Wallet Connected Successfully!</span>
-                    </div>
-                  </div>
-                )}
-              </div>
+    <AppShell>
+      <PageHeading
+        icon={Wallet}
+        title="Wallet & anchoring key"
+        description={`Connecting a Solana wallet turns BlockLedger from a local ledger into an anchored one: every state transition is committed to Solana ${cluster} as a memo transaction signed by this key.`}
+        actions={
+          connected ? (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => void disconnect()}
+            >
+              Disconnect
+            </Button>
+          ) : null
+        }
+      />
 
-              {/* Focus Cards */}
-              <div className="mb-16">
-                <FocusCards 
-                  cards={walletOptions} 
-                  onConnect={handleConnectWallet}
-                  isConnecting={connectingWallet}
-                />
-              </div>
-
-              {/* Info Section */}
-              <div className="mt-12 p-6 bg-black/20 rounded-lg border border-gray-800/50">
-                <div className="flex items-start gap-4">
-                  <Users className="w-6 h-6 text-blue-400 mt-1" />
-                  <div>
-                    <h3 className="text-white font-semibold mb-2">Why Connect a Wallet?</h3>
-                    <ul className="space-y-2 text-muted-foreground">
-                      <li className="flex items-center gap-2">
-                        <div className="w-1.5 h-1.5 bg-blue-400 rounded-full" />
-                        Securely store and manage your crypto assets
-                      </li>
-                      <li className="flex items-center gap-2">
-                        <div className="w-1.5 h-1.5 bg-blue-400 rounded-full" />
-                        Interact with DeFi protocols and smart contracts
-                      </li>
-                      <li className="flex items-center gap-2">
-                        <div className="w-1.5 h-1.5 bg-blue-400 rounded-full" />
-                        Access premium features and AI-powered insights
-                      </li>
-                      <li className="flex items-center gap-2">
-                        <div className="w-1.5 h-1.5 bg-blue-400 rounded-full" />
-                        Track your portfolio performance in real-time
-                      </li>
-                    </ul>
-                  </div>
-                </div>
+      {connected && walletAddress && derivedDid ? (
+        <Card className="border-emerald-500/30">
+          <CardHeader>
+            <div className="flex items-center gap-2">
+              <CheckCircle2 className="size-5 text-emerald-400" />
+              <div>
+                <CardTitle className="text-base">
+                  Wallet connected — anchoring is live
+                </CardTitle>
+                <CardDescription>
+                  New records will be badged{" "}
+                  <span className="text-emerald-300">On-chain</span> and link to
+                  the Solana explorer.
+                </CardDescription>
               </div>
             </div>
-          </div>
-        </div>
-      </SidebarInset>
-    </SidebarProvider>
+          </CardHeader>
+          <CardContent className="grid gap-4 sm:grid-cols-2">
+            <div className="space-y-1">
+              <p className="text-xs tracking-wide text-muted-foreground uppercase">
+                Address
+              </p>
+              <MonoValue value={walletAddress} />
+              <a
+                href={explorerAddressUrl(walletAddress) ?? "#"}
+                target="_blank"
+                rel="noreferrer noopener"
+                className="block text-xs text-sky-300 underline-offset-4 hover:underline"
+              >
+                View on Solana Explorer →
+              </a>
+            </div>
+            <div className="space-y-1">
+              <p className="flex items-center gap-1.5 text-xs tracking-wide text-muted-foreground uppercase">
+                <Fingerprint className="size-3.5" />
+                Derived identity
+              </p>
+              <MonoValue value={derivedDid} />
+              <p className="text-xs text-muted-foreground">
+                Resolvable through the BlockLedger identity registry.
+              </p>
+            </div>
+            <div className="space-y-1">
+              <p className="flex items-center gap-1.5 text-xs tracking-wide text-muted-foreground uppercase">
+                <Radio className="size-3.5" />
+                Cluster
+              </p>
+              <p className="font-mono text-xs">solana {cluster}</p>
+            </div>
+            <div className="space-y-1">
+              <p className="text-xs tracking-wide text-muted-foreground uppercase">
+                IPFS pinning
+              </p>
+              <p className="font-mono text-xs">
+                {isIpfsConfigured
+                  ? "Pinata configured"
+                  : "not configured — CIDs will be null"}
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+      ) : (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">No wallet connected</CardTitle>
+            <CardDescription>
+              BlockLedger stays fully usable — transitions are recorded in the
+              local hash-chain and badged{" "}
+              <span className="text-amber-300">Local / simulated</span>. No
+              signature is ever fabricated.
+            </CardDescription>
+          </CardHeader>
+        </Card>
+      )}
+
+      <div>
+        <h2 className="mb-4 text-sm font-medium tracking-wide text-muted-foreground uppercase">
+          Choose a wallet
+        </h2>
+        <FocusCards
+          cards={WALLET_OPTIONS}
+          onConnect={handleConnectWallet}
+          isConnecting={connectingWallet}
+        />
+      </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">
+            What the wallet is used for
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <ul className="space-y-2 text-sm text-muted-foreground">
+            <li className="flex gap-2">
+              <span className="mt-2 size-1.5 shrink-0 rounded-full bg-sky-400" />
+              Signing memo transactions that anchor the SHA-256 digest of each
+              identity, asset and access-control transition.
+            </li>
+            <li className="flex gap-2">
+              <span className="mt-2 size-1.5 shrink-0 rounded-full bg-sky-400" />
+              Deriving your{" "}
+              <span className="font-mono text-foreground">did:blkl:sol</span>{" "}
+              decentralized identifier from the public key.
+            </li>
+            <li className="flex gap-2">
+              <span className="mt-2 size-1.5 shrink-0 rounded-full bg-sky-400" />
+              Producing explorer-verifiable proof that an audit entry existed at
+              a given block time.
+            </li>
+            <li className="flex gap-2">
+              <span className="mt-2 size-1.5 shrink-0 rounded-full bg-sky-400" />
+              Nothing else — BlockLedger never requests token approvals or
+              transfers of value.{" "}
+              <Link
+                href="/audit"
+                className="text-sky-300 underline underline-offset-4"
+              >
+                Inspect the audit trail
+              </Link>
+              .
+            </li>
+          </ul>
+        </CardContent>
+      </Card>
+    </AppShell>
   );
 }
 
