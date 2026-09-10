@@ -24,4 +24,5 @@ yarn-error.log*
 
 # typescript
 *.tsbuildinfo
-next-env.d.ts.ruff_cache/
+next-env.d.ts
+.ruff_cache/
