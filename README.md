@@ -203,17 +203,19 @@ All demo accounts use the password `password123`.
 
 ## 14. Team
 
-**Team name:** `<TEAM_NAME>`
-**Institute:** `<INSTITUTE_NAME>`
+**Team name:** Mercury
+**Institute:** Netaji Subhas University of Technology (NSUT)
 
 | Name | Role |
 |---|---|
-| `<TEAM_MEMBER_1>` | `<ROLE>` |
-| `<TEAM_MEMBER_2>` | `<ROLE>` |
-| `<TEAM_MEMBER_3>` | `<ROLE>` |
-| `<TEAM_MEMBER_4>` | `<ROLE>` |
-| `<TEAM_MEMBER_5>` | `<ROLE>` |
-| `<TEAM_MEMBER_6>` | `<ROLE>` |
+| **Harsh** *(Team Leader)* | Full-stack lead, system architecture |
+| **Anushka** | Blockchain integration, Solana devnet anchoring |
+| **Sanyyam** | Contract layer, identity registry and RBAC |
+| **Prakhar** | Frontend engineering, UI implementation |
+| **Zoya** | Cryptography, hash-chained audit ledger |
+| **Shauryan** | IPFS / decentralised storage, deployment and QA |
+
+Harsh and Anushka are Smart India Hackathon 2025 winners.
 
 ## Important
 
