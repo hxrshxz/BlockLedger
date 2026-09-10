@@ -1,5 +1,9 @@
 # Demo Video
 
+## Live deployment
+
+**https://cyfuture-landing-page.vercel.app**
+
 No demo video has been recorded yet.
 
 ## What the video will show

@@ -11,6 +11,8 @@
 ![Software](https://img.shields.io/badge/Category-Software-555?style=flat-square)
 ![Blockchain & Cybersecurity](https://img.shields.io/badge/Theme-Blockchain%20%26%20Cybersecurity-555?style=flat-square)
 
+**[🔗 Live deployment → cyfuture-landing-page.vercel.app](https://cyfuture-landing-page.vercel.app)**
+
 </div>
 
 > [!IMPORTANT]
